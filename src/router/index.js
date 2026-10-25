@@ -4,10 +4,15 @@ import LoginView from '../views/LoginView.vue'
 import DashboardView from '../views/DashboardView.vue' 
 import ManualFetchView from '../views/ManualFetchView.vue'
 import KelolaIsuView from '../views/KelolaIsuView.vue'
+import UserListIsuView from '../views/UserListIsuView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/',
+      redirect: '/dashboard'
+    },
     {
       path: '/login',
       name: 'login',
@@ -15,8 +20,8 @@ const router = createRouter({
       meta: { requiresGuest: true }
     },
     {
-      path: '/dashboard', 
-      name: 'dashboard',
+      path: '/admin/dashboard', 
+      name: 'adminDashboard',
       component: DashboardView,
       meta: { requiresAuth: true }
     },
@@ -35,6 +40,11 @@ const router = createRouter({
       name: 'kelola-isu',
       component: KelolaIsuView,
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: UserListIsuView
     }
   ]
 })

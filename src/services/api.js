@@ -12,8 +12,6 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = sessionStorage.getItem('session_token');
-    
-    console.log("Token yang akan dikirim ke Backend:", token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
