@@ -4,6 +4,16 @@
     <header class="navbar">
       <div class="navbar-content">
         <h1 class="logo">Isu Publik Bali</h1>
+        <RouterLink
+          v-if="authStore.isAuthenticated"
+          to="/admin/dashboard"
+          class="admin-access-link"
+        >
+          Dashboard Admin
+        </RouterLink>
+        <RouterLink v-else to="/login" class="admin-access-link">
+          Login Admin
+        </RouterLink>
       </div>
     </header>
 
@@ -98,20 +108,40 @@
       <div v-if="isLoading" class="loading-state">Memuat berita...</div>
       
       <div v-else class="news-list">
-        <div v-for="isu in beritaHalamanIni" :key="isu.id_postingan" class="news-card">
+        <article
+          v-for="isu in beritaHalamanIni"
+          :key="idIsu(isu) || isu.topik"
+          class="news-card"
+        >
           <div class="news-content">
-            <h3 class="news-title">{{ isu.topik }}</h3>
+            <RouterLink
+              class="news-title-link"
+              :to="{ name: 'detail-isu', params: { id: String(idIsu(isu) ?? '') } }"
+            >
+              <h3 class="news-title">{{ isu.topik }}</h3>
+            </RouterLink>
             <p class="news-snippet">{{ isu.ringkasan_ai || isu.caption }}</p>
             <div class="news-meta">
               <span class="meta-pill outline">{{ isu.kategori || 'Umum' }}</span>
-              <span class="meta-pill outline">Skor : {{ (isu.skor_sentimen || 0) * 100 }}%</span>
+              <span class="meta-pill outline">Skor viralitas: {{ formatSkorViralitas(isu) }}</span>
             </div>
+            <RouterLink
+              class="read-more"
+              :to="{ name: 'detail-isu', params: { id: String(idIsu(isu) ?? '') } }"
+            >
+              Baca selengkapnya <span aria-hidden="true">→</span>
+            </RouterLink>
           </div>
           <div class="news-image">
-            <img v-if="isu.url_gambar" :src="isu.url_gambar" alt="Gambar Isu" />
-            <div v-else class="image-placeholder">ðŸ–¼ï¸</div>
+            <img
+              v-if="urlGambar(isu) && !gambarGagal.has(kunciGambar(isu))"
+              :src="urlGambar(isu)"
+              alt="Gambar Isu"
+              @error="tandaiGambarGagal(kunciGambar(isu))"
+            />
+            <div v-else class="image-placeholder">🖼️</div>
           </div>
-        </div>
+        </article>
 
         <p v-if="beritaHalamanIni.length === 0" class="empty-news">Belum ada berita untuk ditampilkan.</p>
 
@@ -187,6 +217,8 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick, watch } from 'vue';
+import { RouterLink } from 'vue-router';
+import { useAuthStore } from '../stores/authStore';
 import api from '../services/api';
 import { Bar, Doughnut } from 'vue-chartjs';
 import {
@@ -203,6 +235,18 @@ import {
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement);
 
 const daftarIsu = ref([]);
+const authStore = useAuthStore();
+const idIsu = (isu) => isu.id_qdrant ?? isu.id_postingan ?? isu.id ?? isu._id;
+const urlGambar = (isu) => isu?.url_gambar || isu?.image_url || isu?.gambar || '';
+const gambarGagal = ref(new Set());
+const kunciGambar = (isu) => String(idIsu(isu) ?? isu.topik);
+const tandaiGambarGagal = (key) => {
+  gambarGagal.value = new Set([...gambarGagal.value, key]);
+};
+const formatSkorViralitas = (isu) => {
+  const skor = Number(isu?.skor_viralitas);
+  return Number.isFinite(skor) ? `${skor.toFixed(1)}%` : '0%';
+};
 const halamanAktif = ref(1);
 const beritaPerHalaman = 10;
 const totalPages = computed(() => Math.ceil(isuTersaring.value.length / beritaPerHalaman));
@@ -453,7 +497,7 @@ onMounted(muatDataBerita);
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
 }
 .logo {
@@ -599,6 +643,16 @@ onMounted(muatDataBerita);
   font-style: italic;
 }
 @media (max-width: 700px) {
+  .navbar {
+    padding: 14px 20px;
+  }
+  .logo {
+    font-size: 20px;
+  }
+  .admin-access-link {
+    padding: 0 12px;
+    font-size: 13px;
+  }
   .charts-section {
     grid-template-columns: 1fr;
   }
@@ -661,6 +715,30 @@ onMounted(muatDataBerita);
 .date-input-label input:focus {
   outline: 2px solid #69aee0;
   outline-offset: 1px;
+}
+.admin-access-link {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 20px;
+  background: white;
+  color: var(--blue-900);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+.admin-access-link:hover {
+  background: #e7f2fc;
+  box-shadow: 0 3px 9px rgba(21, 59, 102, 0.2);
+}
+.admin-access-link:focus-visible {
+  outline: 3px solid #69aee0;
+  outline-offset: 2px;
 }
 .active-filters {
   max-width: 1000px;
@@ -789,6 +867,27 @@ onMounted(muatDataBerita);
   font-size: 18px;
   margin: 0 0 10px 0;
 }
+.news-title-link {
+  color: inherit;
+  text-decoration: none;
+}
+.news-title-link:hover .news-title {
+  color: var(--blue-700);
+  text-decoration: underline;
+}
+.read-more {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--blue-700);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.read-more:hover {
+  color: var(--blue-950);
+  text-decoration: underline;
+}
 .news-snippet {
   color: #60758a;
   font-size: 14px;
@@ -818,7 +917,7 @@ onMounted(muatDataBerita);
   width: 200px;
   height: 140px;
   background-color: #e6f1fa;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
 }
 .news-image img {
@@ -832,7 +931,8 @@ onMounted(muatDataBerita);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30px;
+  font-size: 50px;
+  color: #a0a0a0;
 }
 
 /* 6. FOOTER */
@@ -891,5 +991,4 @@ onMounted(muatDataBerita);
   font-size: 12px;
 }
 </style>
-
 

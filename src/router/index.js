@@ -5,6 +5,7 @@ import DashboardView from '../views/DashboardView.vue'
 import ManualFetchView from '../views/ManualFetchView.vue'
 import KelolaIsuView from '../views/KelolaIsuView.vue'
 import UserListIsuView from '../views/UserListIsuView.vue'
+import DetailIsuView from '../views/DetailIsuView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,6 +46,12 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: UserListIsuView
+    },
+    {
+      path: '/detail-isu/:id',
+      name: 'detail-isu',
+      component: DetailIsuView,
+      props: true
     }
   ]
 })
