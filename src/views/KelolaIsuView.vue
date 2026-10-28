@@ -1,19 +1,6 @@
 <template>
-  <div class="admin-layout">
-    <!-- Navigasi -->
-    <nav class="admin-nav">
-      <h2>Judul | Beranda Admin</h2>
-      <div class="nav-links">
-        <RouterLink to="/dashboard">Dashboard</RouterLink>
-        <RouterLink to="/tarik-manual">Tarik Manual</RouterLink>
-        <RouterLink to="/kelola-isu" class="active">Kelola Isu</RouterLink>
-        <a href="#" @click.prevent="prosesLogout">Admin ▾</a>
-      </div>
-    </nav>
-
+  <AdminLayout page-title="Edit Data Isu">
     <main class="content-wrapper">
-      <h3 class="page-title">Kelola Isu</h3>
-
       <!-- BAGIAN MASTER (FORM EDIT STATIS) -->
       <div class="edit-panel">
         <div class="form-group row">
@@ -101,7 +88,7 @@
                 <td>
                   <button class="btn-edit" @click="persiapkanEdit(item)">Edit</button>
                 </td>
-              </tr>''
+              </tr>
               <tr v-if="logData.length === 0">
                 <td colspan="5" style="text-align: center; padding: 2rem;">Memuat data isu...</td>
               </tr>
@@ -110,17 +97,15 @@
         </div>
       </div>
     </main>
-  </div>
+  </AdminLayout>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router'; 
+import AdminLayout from '../components/AdminLayout.vue';
 import api from '../services/api';
 import Swal from 'sweetalert2';
-// import { useAuthStore } from '../stores/authStore';
 
-const router = useRouter();
 const logData = ref([]);
 
 const searchQuery = ref('');
@@ -301,59 +286,13 @@ const simpanPerubahan = async () => {
   });
 };
 
-const prosesLogout = () => {
-  Swal.fire({
-    title: 'Keluar dari Sistem?',
-    text: "Anda harus login kembali untuk mengakses panel admin.",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#8c8c8c',
-    confirmButtonText: 'Ya, Keluar',
-    cancelButtonText: 'Batal'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      authStore.logout(); 
-      
-      router.push('/login'); 
-      
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: 'Anda telah berhasil keluar.',
-        showConfirmButton: false,
-        timer: 1500
-      });
-    }
-  });
-};
-
 onMounted(() => {
   muatTabelData();
 });
 </script>
 
 <style scoped>
-/* Reset & Layout Dasar (Disesuaikan dengan wireframe Abu-abu) */
-.admin-layout {
-  min-height: 100vh;
-  background-color: #f5f5f5;
-  font-family: sans-serif;
-}
-.admin-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #8c8c8c;
-  color: white;
-  padding: 1rem 2rem;
-}
-.admin-nav h2 { margin: 0; font-size: 1.5rem; }
-.nav-links a { color: white; text-decoration: none; margin-left: 1.5rem; font-weight: 500; }
-.nav-links a.active { border-bottom: 2px solid white; padding-bottom: 4px; }
-.content-wrapper { padding: 2rem; max-width: 1100px; margin: 0 auto; }
-.page-title { margin-top: 0; margin-bottom: 1rem; color: #333; font-weight: normal; }
+.content-wrapper { padding: 0; max-width: 1200px; margin: 0 auto; }
 
 .table-header {
   display: flex;
@@ -366,16 +305,18 @@ onMounted(() => {
 }
 .search-box {
   width: 300px;
-  border-radius: 20px; /* Membuat ujung kotak membulat */
+  border-radius: 10px;
   padding: 0.5rem 1rem;
 }
 
 /* PANEL EDIT (MASTER) */
 .edit-panel {
-  background-color: #e0e0e0;
+  background-color: #fff;
   padding: 2rem;
   margin-bottom: 2rem;
-  border-radius: 4px;
+  border: 1px solid #d5e5f2;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(16, 45, 79, 0.07);
 }
 .form-group.row {
   display: flex;
@@ -385,7 +326,7 @@ onMounted(() => {
 .col-label {
   flex: 0 0 150px;
   font-weight: bold;
-  color: #333;
+  color: #153b66;
   padding-top: 0.5rem;
 }
 .col-input {
@@ -394,7 +335,7 @@ onMounted(() => {
 .read-only-text {
   margin: 0;
   padding-top: 0.5rem;
-  color: #333;
+  color: #28445f;
 }
 .placeholder-text {
   color: #888;
@@ -403,14 +344,14 @@ onMounted(() => {
 .form-control {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #cfcfcf; /* Warna abu-abu input */
+  border: 1px solid #c9dceb;
+  border-radius: 8px;
+  background-color: #fff;
   font-family: inherit;
   resize: vertical;
 }
 .form-control:disabled {
-  background-color: #d9d9d9;
+  background-color: #f3f8fd;
   cursor: not-allowed;
 }
 .dropdown-short {
@@ -426,20 +367,26 @@ onMounted(() => {
   gap: 1rem;
 }
 .btn-batal {
-  background-color: #a0a0a0;
+  background-color: #64748b;
   color: white;
   border: none;
   padding: 0.5rem 1.5rem;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 .btn-simpan {
-  background-color: #8c8c8c;
+  background-color: #1769aa;
   color: white;
   border: none;
   padding: 0.5rem 1.5rem;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 8px;
+}
+.btn-batal:hover:not(:disabled) {
+  background-color: #475569;
+}
+.btn-simpan:hover:not(:disabled) {
+  background-color: #153b66;
 }
 .btn-batal:disabled, .btn-simpan:disabled {
   opacity: 0.5;
@@ -448,17 +395,20 @@ onMounted(() => {
 
 /* PANEL TABEL (DETAIL) */
 .table-section {
-  background: #e0e0e0;
+  background: #fff;
   padding: 1rem;
-  border-radius: 4px;
+  border: 1px solid #d5e5f2;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(16, 45, 79, 0.07);
 }
 .panel-title {
   font-size: 1.1rem;
   margin-bottom: 1rem;
-  color: #333;
+  color: #153b66;
 }
 .table-container {
-  background: transparent;
+  background: #fff;
+  overflow-x: auto;
 }
 .data-table {
   width: 100%;
@@ -467,22 +417,66 @@ onMounted(() => {
 .data-table th, .data-table td {
   padding: 1rem;
   text-align: left;
-  border: 1px solid #999;
+  border-bottom: 1px solid #e4eef7;
 }
 .data-table th {
-  background-color: #d0d0d0;
+  background-color: #f3f8fd;
+  color: #153b66;
   font-weight: bold;
   text-align: center;
 }
 .active-row {
-  background-color: #d5d5d5; /* Penanda baris yang sedang diedit */
+  background-color: #e7f2fc;
 }
 .btn-edit {
-  background-color: #4CAF50;
+  background-color: #1769aa;
   color: white;
   border: none;
   padding: 4px 12px;
-  border-radius: 4px;
+  border-radius: 7px;
   cursor: pointer;
+}
+.btn-edit:hover {
+  background-color: #153b66;
+}
+
+@media (max-width: 640px) {
+  .table-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-box,
+  .dropdown-short {
+    width: 100%;
+  }
+
+  .edit-panel {
+    padding: 1.25rem;
+  }
+
+  .form-group.row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .col-label {
+    flex-basis: auto;
+  }
+
+  .action-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .action-buttons {
+    flex-wrap: wrap;
+  }
+
+  .action-buttons button {
+    flex: 1;
+  }
 }
 </style>

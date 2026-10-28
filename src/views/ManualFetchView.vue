@@ -1,19 +1,6 @@
 <template>
-  <div class="admin-layout">
-    <!-- Navigasi Atas -->
-    <nav class="admin-nav">
-      <h2>Judul | Beranda Admin</h2>
-      <div class="nav-links">
-        <RouterLink to="/dashboard">Dashboard</RouterLink>
-        <RouterLink to="/tarik-manual" class="active">Tarik Manual</RouterLink>
-        <RouterLink to="/kelola-isu">Kelola Isu</RouterLink>
-        <a href="#" @click.prevent="prosesLogout">Admin ▾</a>
-      </div>
-    </nav>
-
+  <AdminLayout page-title="Tarik Data">
     <main class="dashboard-content">
-      <h3 class="page-title">Tarik Manual</h3>
-
       <!-- KOTAK TARIK DATA -->
       <div class="fetch-box">
         <div class="panel-title">TARIK DATA ISU TERBARU</div>
@@ -83,52 +70,20 @@
         </div>
       </div>
     </main>
-  </div>
+  </AdminLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '../stores/authStore';
+import AdminLayout from '../components/AdminLayout.vue';
 import api from '../services/api';
 import Swal from 'sweetalert2';
-
-const router = useRouter();
-const authStore = useAuthStore();
 
 const targetPilihan =ref([]);
 const isFetching = ref(false);
 const logData = ref([]);
 const sumberAkun = ref({ instagram: [], facebook: [] }); 
 
-
-const prosesLogout = () => {
-  Swal.fire({
-    title: 'Keluar dari Sistem?',
-    text: "Anda harus login kembali untuk mengakses panel admin.",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#8c8c8c',
-    confirmButtonText: 'Ya, Keluar',
-    cancelButtonText: 'Batal'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      authStore.logout(); 
-      
-      router.push('/login'); 
-      
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: 'Anda telah berhasil keluar.',
-        showConfirmButton: false,
-        timer: 1500
-      });
-    }
-  });
-};
 
 const muatTabelData = async () => {
   try {
@@ -222,100 +177,63 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Mewarisi struktur layout dari DashboardAdmin */
-.admin-layout { 
-  min-height: 100vh; 
-  background-color: #f8f9fa; 
-  font-family: sans-serif; 
+.dashboard-content {
+  padding: 0;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.admin-nav { 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  background-color: #9e9e9e; 
-  color: white; 
-  padding: 1rem 2rem; 
-}
-
-.admin-nav h2 { 
-  margin: 0; 
-  font-size: 1.5rem; 
-}
-
-.nav-links a { 
-  color: white; 
-  text-decoration: none; 
-  margin-left: 1.5rem; 
-  font-weight: 500; 
-}
-
-.nav-links a.active { 
-  border-bottom: 2px solid white; 
-  padding-bottom: 4px; 
-}
-
-.dashboard-content { 
-  padding: 2rem; 
-  max-width: 1200px; 
-  margin: 0 auto; 
-}
-
-.page-title { 
-  margin-bottom: 1rem; 
-  color: #333; 
-  font-size: 1.3rem; 
-}
-
-.panel-title { 
-  background-color: #e0e0e0; 
-  padding: 0.5rem 1rem; 
-  font-size: 0.85rem; 
-  font-weight: bold; 
-  color: #555; 
-  border-radius: 4px 4px 0 0; 
-  text-transform: uppercase; 
+.panel-title {
+  background-color: #e7f2fc;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #153b66;
+  border: 1px solid #d5e5f2;
+  border-radius: 10px 10px 0 0;
+  text-transform: uppercase;
 }
 
 /* KOTAK TARIK DATA */
-.fetch-box { 
-  background: white; 
-  border-radius: 4px; 
-  border: 1px solid #ddd; 
-  margin-bottom: 2rem; 
+.fetch-box {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #d5e5f2;
+  margin-bottom: 2rem;
+  box-shadow: 0 6px 18px rgba(16, 45, 79, 0.07);
 }
 
 .fetch-form { padding: 2rem; }
 .form-group { margin-bottom: 1.5rem; display: flex; align-items: center; }
-.form-group label { width: 150px; font-weight: bold; color: #555; }
-.form-group select { flex: 1; max-width: 400px; padding: 0.6rem; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9; }
+.form-group label { width: 150px; font-weight: bold; color: #153b66; }
+.form-group select { flex: 1; max-width: 400px; padding: 0.6rem; border: 1px solid #c9dceb; border-radius: 8px; background-color: #fff; }
 .action-row { display: flex; justify-content: flex-end; margin-top: 1rem; }
-.btn-sync { background-color: #9e9e9e; color: white; border: none; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; border-radius: 4px; cursor: pointer; }
-.btn-sync:hover:not(:disabled) { background-color: #7a7a7a; }
+.btn-sync { background-color: #1769aa; color: white; border: none; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; border-radius: 9px; cursor: pointer; }
+.btn-sync:hover:not(:disabled) { background-color: #153b66; }
 .btn-sync:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* TABEL */
 .mt-2 { margin-top: 2rem; }
-.table-container { background: white; border: 1px solid #ddd; border-top: none; }
+.table-container { background: white; border: 1px solid #d5e5f2; border-top: none; border-radius: 0 0 12px 12px; overflow-x: auto; }
 .data-table { width: 100%; border-collapse: collapse; }
-.data-table th, .data-table td { padding: 1rem; text-align: left; border-bottom: 1px solid #ddd; }
-.data-table th { background-color: #f5f5f5; color: #555; font-weight: bold; }
+.data-table th, .data-table td { padding: 1rem; text-align: left; border-bottom: 1px solid #e4eef7; }
+.data-table th { background-color: #f3f8fd; color: #153b66; font-weight: bold; }
 .btn-edit { padding: 4px 10px; background: #42b883; color: white; border: none; border-radius: 4px; cursor: pointer; }
 
 .checkbox-container {
   flex: 1;
-  background: #f9f9f9;
+  background: #f3f8fd;
   padding: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #d5e5f2;
+  border-radius: 10px;
   max-height: 300px;
   overflow-y: auto;
 }
 .category-title {
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: #153b66;
   font-size: 0.95rem;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #d5e5f2;
   padding-bottom: 0.3rem;
 }
 .mt-1 {
@@ -330,9 +248,34 @@ onMounted(() => {
   display: flex;
   align-items: center;
   font-size: 0.9rem;
+  color: #28445f;
   cursor: pointer;
 }
 .checkbox-item input {
   margin-right: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .fetch-form {
+    padding: 1.25rem;
+  }
+
+  .form-group {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .form-group label {
+    width: auto;
+  }
+
+  .checkbox-container {
+    width: 100%;
+  }
+
+  .btn-sync {
+    width: 100%;
+  }
 }
 </style>

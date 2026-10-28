@@ -50,7 +50,7 @@ const prosesLogin = async () => {
       timer: 1500,
       showConfirmButton: false
     }).then(() => {
-      router.push('/dashboard'); 
+      router.push({ name: 'adminDashboard' });
     });
     
   } catch (error) {

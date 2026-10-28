@@ -232,6 +232,8 @@ import {
   ArcElement
 } from 'chart.js';
 
+defineOptions({ name: 'UserListIsuView' });
+
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement);
 
 const daftarIsu = ref([]);
@@ -425,7 +427,7 @@ const muatDataBerita = async () => {
       return;
     }
 
-    const semuaData = response.data.data;
+    const semuaData = response.data.data.filter((item) => item.is_archived !== true);
     daftarIsu.value = semuaData;
     halamanAktif.value = 1;
     pilihIsuTren(semuaData);

@@ -1,15 +1,5 @@
 <template>
-  <div class="admin-layout">
-    <nav class="admin-nav">
-      <h2>Judul | Beranda Admin</h2>
-      <div class="nav-links">
-        <RouterLink to="/dashboard" class="active">Dashboard</RouterLink>
-        <RouterLink to="/tarik-manual">Tarik Manual</RouterLink>
-        <RouterLink to="/kelola-isu">Kelola Isu</RouterLink>
-        <a href="#" @click.prevent="prosesLogout">Admin ▾</a>
-      </div>
-    </nav>
-
+  <AdminLayout page-title="Dashboard Admin">
     <main class="dashboard-content">
       <p class="welcome-text">Selamat Datang Kembali!</p>
 
@@ -84,13 +74,12 @@
         </div>
       </div>
     </main>
-  </div>
+  </AdminLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '../stores/authStore';
+import AdminLayout from '../components/AdminLayout.vue';
 import api from '../services/api';
 
 // 1. IMPORT KOMPONEN CHART.JS
@@ -102,9 +91,6 @@ import {
 
 // Mendaftarkan modul Chart.js agar bisa digunakan
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement);
-
-const router = useRouter();
-const authStore = useAuthStore();
 
 // Variabel Reaktif untuk Panel Kartu & Tabel
 const totalIsu = ref(0);
@@ -127,34 +113,6 @@ const chartOptions = {
       position: 'bottom'
     }
   }
-};
-
-const prosesLogout = () => {
-  Swal.fire({
-    title: 'Keluar dari Sistem?',
-    text: "Anda harus login kembali untuk mengakses panel admin.",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#8c8c8c',
-    confirmButtonText: 'Ya, Keluar',
-    cancelButtonText: 'Batal'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      authStore.logout(); 
-      
-      router.push('/login'); 
-      
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: 'Anda telah berhasil keluar.',
-        showConfirmButton: false,
-        timer: 1500
-      });
-    }
-  });
 };
 
 const ambilDataDashboard = async () => {
@@ -237,54 +195,25 @@ onMounted(() => {
 
 
 <style scoped>
-/* Reset & Layout Dasar */
-.admin-layout {
-  min-height: 100vh;
-  background-color: #f8f9fa;
-  font-family: sans-serif;
-}
-
-/* Navigasi */
-.admin-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #9e9e9e; /* Warna abu-abu sesuai wireframe */
-  color: white;
-  padding: 1rem 2rem;
-}
-.admin-nav h2 {
-  margin: 0;
-  font-size: 1.5rem;
-}
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  margin-left: 1.5rem;
-  font-weight: 500;
-}
-.nav-links a.active { 
-  border-bottom: 2px solid white; padding-bottom: 4px; 
-}
-
 /* Konten Utama */
 .dashboard-content {
-  padding: 2rem;
+  padding: 0;
   max-width: 1200px;
   margin: 0 auto;
 }
 .welcome-text {
   font-size: 1.2rem;
-  margin-bottom: 1.5rem;
-  color: #333;
+  margin: 0 0 1.5rem;
+  color: #153b66;
 }
 .panel-title {
-  background-color: #e0e0e0;
+  background-color: #e7f2fc;
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
   font-weight: bold;
-  color: #555;
-  border-radius: 4px 4px 0 0;
+  color: #153b66;
+  border: 1px solid #d5e5f2;
+  border-radius: 10px 10px 0 0;
   text-transform: uppercase;
 }
 
@@ -293,25 +222,28 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
-  background-color: #e0e0e0;
+  background-color: #fff;
   padding: 1rem;
-  border-radius: 0 0 4px 4px;
+  border: 1px solid #d5e5f2;
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
   margin-bottom: 2rem;
 }
 .metric-card {
   background: white;
   padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border: 1px solid #e1edf7;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(16, 45, 79, 0.06);
 }
 .metric-card p {
   margin: 0 0 0.5rem 0;
-  color: #666;
+  color: #61758a;
   font-size: 0.9rem;
 }
 .metric-card h2, .metric-card h4 {
   margin: 0;
-  color: #333;
+  color: #153b66;
 }
 
 /* Area Grafik */
@@ -324,13 +256,14 @@ onMounted(() => {
 .chart-box {
   background: white;
   padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border: 1px solid #d5e5f2;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(16, 45, 79, 0.07);
   text-align: center;
 }
 .chart-title {
   font-weight: bold;
-  color: #555;
+  color: #153b66;
   margin-bottom: 1rem;
 }
 .placeholder-chart {
@@ -346,8 +279,10 @@ onMounted(() => {
 /* Tabel Data */
 .table-container {
   background: white;
-  border: 1px solid #ddd;
+  border: 1px solid #d5e5f2;
   border-top: none;
+  border-radius: 0 0 12px 12px;
+  overflow-x: auto;
 }
 .data-table {
   width: 100%;
@@ -356,12 +291,12 @@ onMounted(() => {
 .data-table th, .data-table td {
   padding: 1rem;
   text-align: left;
-  border-bottom: 1px solid #ddd;
-  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #e4eef7;
+  border-right: 1px solid #e4eef7;
 }
 .data-table th {
-  background-color: #f5f5f5;
-  color: #555;
+  background-color: #f3f8fd;
+  color: #153b66;
   font-weight: bold;
 }
 .data-table td:last-child, .data-table th:last-child {
@@ -376,7 +311,29 @@ onMounted(() => {
   justify-content: center;
 }
 .empty-chart {
-  color: #999;
+  color: #8196a9;
   font-style: italic;
+}
+
+@media (max-width: 760px) {
+  .metrics-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .charts-section {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.75rem;
+  }
 }
 </style>
